@@ -1,8 +1,8 @@
 from json import dumps
 
-from src.domain.enums.http_response.internal_code import InternalCode
-
 from fastapi import Response
+
+from src.domain.enums.http_response.internal_code import InternalCode
 
 
 class ResponseModel:
