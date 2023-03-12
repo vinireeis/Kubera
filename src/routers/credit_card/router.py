@@ -4,7 +4,6 @@ from src.domain.validators.credit_card.validator import CreditCardValidator
 
 
 class CreditCardRouter:
-
     __router = APIRouter(prefix="/api/v1", tags=["Credit Card"])
 
     @staticmethod
@@ -23,12 +22,7 @@ class CreditCardRouter:
 
     @staticmethod
     @__router.post("/credit-card")
-    async def register_new_credit_card(request: Request, payload: CreditCardValidator = Depends()):
+    async def register_new_credit_card(
+        request: Request, payload: CreditCardValidator = Depends()
+    ):
         pass
-
-
-
-
-
-
-

@@ -4,10 +4,7 @@ from src.routers.credit_card.router import CreditCardRouter
 
 
 class BaseRouter:
-    __app = FastAPI(
-        title="Kubera API",
-        description="Credit Card Crud"
-    )
+    __app = FastAPI(title="Kubera API", description="Credit Card system")
 
     @classmethod
     def __include_credit_card_router(cls):
@@ -42,6 +39,3 @@ class BaseRouter:
 
         finally:
             return response
-
-
-
