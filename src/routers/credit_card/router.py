@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Request, Response, Depends
 
+from src.domain.validators.credit_card.validator import CreditCardValidator
+
 
 class CreditCardRouter:
 
@@ -15,8 +17,8 @@ class CreditCardRouter:
         pass
 
     @staticmethod
-    @__router.get("/credit-card/<:key>")
-    async def get_one_credit_card(request: Request, payload: CreditCardValidator):
+    @__router.get("/credit-card/{number}")
+    async def get_credit_card_details(request: Request, number: int):
         pass
 
     @staticmethod
