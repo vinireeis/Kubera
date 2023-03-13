@@ -8,15 +8,13 @@ from pydantic import BaseModel, validator, Extra, constr, ValidationError
 
 
 class CreditCardValidator(BaseModel, extra=Extra.forbid):
-
     exp_date: Union[str, datetime]
     holder: constr(min_length=2)
-    number: int
+    number: constr(min_length=13, max_length=19)
     cvv: Optional[int]
 
     @validator("cvv")
     def validate_cvv(cls, cvv) -> Union[int, None]:
-
         if not cvv:
             return cvv
 
@@ -28,12 +26,19 @@ class CreditCardValidator(BaseModel, extra=Extra.forbid):
         return cvv
 
     @validator("number")
-    def validate_credit_card_number(cls, number) -> int:
+    def validate_credit_card_number_is_numeric(cls, number) -> str:
+        if not number.is_numeric():
+            raise ValidationError("The number must contain numeric characters only.")
+
+        return number
+
+    @validator("number")
+    def validate_credit_card_number(cls, number) -> str:
         credit_card = CreditCard(number=number)
         is_valid = credit_card.is_valid()
 
         if not is_valid:
-            raise ValidationError("Invalid credit card number")
+            raise ValidationError("Invalid credit card number.")
 
         return number
 
@@ -44,13 +49,15 @@ class CreditCardValidator(BaseModel, extra=Extra.forbid):
             expiration_date_utc = expiration_date_converted.astimezone(tz=pytz.utc)
         except Exception as ex:
             # logging
-            raise ValidationError('invalid expiry date format, use as follows "MM/YYYY" or "MM-YYYY".')
+            raise ValidationError(
+                'invalid expiry date format, use as follows "MM/YYYY" or "MM-YYYY".'
+            )
 
         today_datetime = datetime.today()
         today_utc = today_datetime.astimezone(tz=pytz.utc)
         credit_card_is_expired = expiration_date_utc > today_utc
 
         if credit_card_is_expired:
-            raise ValidationError("Expired credit card")
+            raise ValidationError("Expired credit card.")
 
         return expiration_date_utc
