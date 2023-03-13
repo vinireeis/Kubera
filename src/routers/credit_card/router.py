@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Response, Depends
+from fastapi import APIRouter, Request, Depends
 
 from src.domain.validators.credit_card.validator import CreditCardValidator
 
