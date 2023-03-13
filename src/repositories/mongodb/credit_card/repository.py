@@ -31,7 +31,6 @@ class CreditCardRepository(MongoDbBaseRepository):
 
     @classmethod
     async def find_one_by_credit_card_number(cls, payload: CreditCardValidator):
-
         collection = await cls._get_collection()
         number = payload.number
 

@@ -1,8 +1,6 @@
-# Jormungandr - Onboarding
-from src.infrastructures.mongodb.infrastructure import MongoDBInfrastructure
-
-# Standards
 from abc import abstractmethod
+
+from src.infrastructures.mongodb.infrastructure import MongoDBInfrastructure
 
 
 class MongoDbBaseRepository:
