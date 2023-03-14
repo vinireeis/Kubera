@@ -1,5 +1,4 @@
-from fastapi import Depends
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm
 from passlib.hash import bcrypt
 
 from src.domain.exceptions.services.exception import InvalidPassword
