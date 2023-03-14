@@ -10,4 +10,3 @@ class UserService:
         await UserRepository.insert_one(new_user=new_user_model)
 
         return "user successfully registered"
-
