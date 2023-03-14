@@ -39,7 +39,7 @@ class UserNotExists(ServiceException):
 class InvalidPassword(ServiceException):
     def __init__(self, *args, **kwargs):
         self.msg = "Invalid password"
-        self.status_code = HTTPStatus.OK
+        self.status_code = HTTPStatus.UNAUTHORIZED
         self.internal_code = InternalCode.INVALID_AUTHENTICATION
         self.success = False
         super().__init__(
