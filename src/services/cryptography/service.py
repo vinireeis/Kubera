@@ -6,7 +6,7 @@ from src.domain.validators.credit_card.validator import CreditCardValidator
 
 
 class CryptographyService:
-    fernet_crypter = Fernet(config("KUBERA_ENCRYPTION_KEY"))
+    fernet_crypter = Fernet(config("KUBERA_ENCRYPTION_KEY").encode())
 
     @classmethod
     async def encrypt_number(cls, payload: CreditCardValidator) -> bytes:

@@ -24,6 +24,7 @@ class NewUserModel:
 
 class UserModel:
     def __init__(self, user_data: dict):
+        self.id = user_data.get("id")
         self.username = user_data.get("username")
         self.password_hash = user_data.get("password")
         self.credit_cards = user_data.get("credit_card")

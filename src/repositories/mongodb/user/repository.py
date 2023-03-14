@@ -29,7 +29,9 @@ class UserRepository(MongoDbBaseRepository):
 
         try:
             result: UpdateResult = await collection.update_one(
-                filter={"username": new_user.username}, update={"$setOnInsert": user_template}, upsert=True
+                filter={"username": new_user.username},
+                update={"$setOnInsert": user_template},
+                upsert=True,
             )
 
             if not result.upserted_id:

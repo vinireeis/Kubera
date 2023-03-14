@@ -10,8 +10,10 @@ class CreditCardService:
     async def get_credit_card_details(self):
         pass
 
-    async def register_new_credit_card(self, payload: CreditCardValidator):
+    @staticmethod
+    async def register_new_credit_card(payload: CreditCardValidator):
         number_encrypted = await CryptographyService.encrypt_number(payload=payload)
         credit_card_model = CreditCardModel(
             payload=payload, number_encrypted=number_encrypted
         )
+        return "teste ok"

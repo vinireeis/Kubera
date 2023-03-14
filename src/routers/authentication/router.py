@@ -1,12 +1,11 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Response, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
-from src.services.authentication.service import AuthenticationService
-from src.services.user.service import UserService
 from src.domain.enums.http_response.internal_code import InternalCode
 from src.domain.models.http_response.model import ResponseModel
+from src.services.authentication.service import AuthenticationService
 
 
 class AuthenticationRouter:
@@ -17,9 +16,9 @@ class AuthenticationRouter:
         return AuthenticationRouter.__router
 
     @staticmethod
-    @__router.get("/token")
-    async def get_token(form: OAuth2PasswordRequestForm) -> Response:
-        result = AuthenticationService.authenticate_user(form=form)
+    @__router.post("/token")
+    async def get_token(form: OAuth2PasswordRequestForm = Depends()) -> Response:
+        result = await AuthenticationService.generate_token(form=form)
         response = ResponseModel(
             success=True, result=result, internal_code=InternalCode.SUCCESS
         ).build_http_response(status_code=HTTPStatus.OK)

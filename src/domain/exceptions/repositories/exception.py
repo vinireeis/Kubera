@@ -1,7 +1,7 @@
-from src.domain.exceptions.base.exception import RepositoryException
-from src.domain.enums.http_response.internal_code import InternalCode
-
 from http import HTTPStatus
+
+from src.domain.enums.http_response.internal_code import InternalCode
+from src.domain.exceptions.base.exception import RepositoryException
 
 
 class UserAlreadyExists(RepositoryException):
