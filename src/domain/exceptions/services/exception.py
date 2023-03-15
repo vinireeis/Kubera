@@ -50,3 +50,35 @@ class InvalidPassword(ServiceException):
             *args,
             **kwargs
         )
+
+
+class InvalidOrExpiredToken(ServiceException):
+    def __init__(self, *args, **kwargs):
+        self.msg = "Invalid or expired token"
+        self.status_code = HTTPStatus.UNAUTHORIZED
+        self.internal_code = InternalCode.INVALID_AUTHENTICATION
+        self.success = False
+        super().__init__(
+            self.msg,
+            self.status_code,
+            self.internal_code,
+            self.success,
+            *args,
+            **kwargs
+        )
+
+
+class CreditCardAlreadyRegistered(ServiceException):
+    def __init__(self, *args, **kwargs):
+        self.msg = "Credit card already registered"
+        self.status_code = HTTPStatus.BAD_REQUEST
+        self.internal_code = InternalCode.DATA_ALREADY_EXISTS
+        self.success = False
+        super().__init__(
+            self.msg,
+            self.status_code,
+            self.internal_code,
+            self.success,
+            *args,
+            **kwargs
+        )

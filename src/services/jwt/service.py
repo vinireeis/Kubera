@@ -22,7 +22,9 @@ class JwtTokenService:
 
     @classmethod
     async def validate_token(cls, jwt: str):
-        jwt_lib.decode(jwt=jwt, key=cls.key, algorithms=cls.algorithm, do_time_check=True)
+        jwt_lib.decode(
+            jwt=jwt, key=cls.key, algorithms=cls.algorithm, do_time_check=True
+        )
         return True
 
     @classmethod

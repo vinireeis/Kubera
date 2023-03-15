@@ -1,7 +1,9 @@
+from typing import List
+
+import loglifos
 from decouple import config
 
 from src.domain.models.credit_card.model import CreditCardModel
-from src.domain.validators.credit_card.validator import CreditCardValidator
 from src.repositories.mongodb.base.base import MongoDbBaseRepository
 
 
@@ -18,38 +20,44 @@ class CreditCardRepository(MongoDbBaseRepository):
             raise ex
 
     @classmethod
-    async def insert_one_credit_card(cls, credit_card_model: CreditCardModel):
+    async def insert_one_credit_card(cls, credit_card: CreditCardModel):
         collection = await cls._get_collection()
-        credit_card_template = credit_card_model.get_template_to_save()
+        credit_card_template = credit_card.get_template_to_save()
 
         try:
-            await collection.insert_one(credit_card_template)
+            await collection.update_one(
+                filter={"id": credit_card.user_id},
+                update={"$push": {"credit_card": credit_card_template}},
+            )
 
         except Exception as ex:
-            # logg
+            loglifos.error(exception=ex, msg=str(ex))
             raise ex
 
     @classmethod
-    async def find_one_by_credit_card_number(cls, payload: CreditCardValidator):
+    async def find_one_credit_card_details(cls, credit_card: CreditCardModel):
         collection = await cls._get_collection()
-        number = payload.number
 
         try:
-            result = await collection.find_one({"number": number})
+            result = await collection.find_one(
+                {"id": credit_card.user_id, "credit_card.number": credit_card.number_encrypted}
+            )
             return result
 
         except Exception as ex:
-            # logg
+            loglifos.error(exception=ex, msg=str(ex))
             raise ex
 
     @classmethod
-    async def find_all_credit_cards(cls):
+    async def find_all_credit_cards(cls, decrypted_token) -> List:
         collection = await cls._get_collection()
+        id = decrypted_token.get("id")
 
         try:
-            result = await collection.find()
-            return result
+            cursor = collection.find({"id": id}, {"credit_card.number": 1, "_id": 0})
+            credit_cards_data = [credit_card for credit_card in await cursor.to_list(length=100)]
+            return credit_cards_data
 
         except Exception as ex:
-            # logg
+            loglifos.error(exception=ex, msg=str(ex))
             raise ex

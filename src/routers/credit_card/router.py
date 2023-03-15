@@ -17,16 +17,23 @@ class CreditCardRouter:
 
     @staticmethod
     @__router.get("/credit-card")
-    async def get_all_credit_cards(request: Request, token: str = Depends(oauth2_scheme)):
+    async def get_all_credit_cards(
+        request: Request, token: str = Depends(oauth2_scheme)
+    ):
         pass
 
     @staticmethod
     @__router.get("/credit-card/{number}")
-    async def get_credit_card_details(request: Request, number: int, token: str = Depends(oauth2_scheme)):
+    async def get_credit_card_details(number: int, token: str = Depends(oauth2_scheme)):
         pass
 
     @staticmethod
     @__router.post("/credit-card")
-    async def register_new_credit_card(payload: CreditCardValidator, token: str = Depends(oauth2_scheme)):
+    async def register_new_credit_card(
+        payload: CreditCardValidator, token: str = Depends(oauth2_scheme)
+    ):
         await AuthenticationService.verify_token(token=token)
-        message = await CreditCardService.register_new_credit_card(payload=payload)
+        message = await CreditCardService.register_new_credit_card(
+            payload=payload, token=token
+        )
+        return {"teste": "ok"}

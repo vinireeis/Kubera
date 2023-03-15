@@ -1,7 +1,6 @@
 from cryptography.fernet import Fernet
 from decouple import config
 
-from src.domain.models.credit_card.model import CreditCardModel
 from src.domain.validators.credit_card.validator import CreditCardValidator
 
 
@@ -16,8 +15,8 @@ class CryptographyService:
         return number_encrypted
 
     @classmethod
-    async def decrypt_number(cls, payload: CreditCardModel) -> str:
-        token = payload.number_encoded  # TODO: ajustar com o obj de retorno do banco
-        decrypted_number = cls.fernet_crypter.decrypt(token=token)
+    async def decrypt_number(cls, number: bytes) -> str:
+        decrypted_number = cls.fernet_crypter.decrypt(token=number)
         number = decrypted_number.decode()
+
         return number

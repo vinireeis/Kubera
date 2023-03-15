@@ -5,12 +5,18 @@ from src.domain.validators.credit_card.validator import CreditCardValidator
 
 
 class CreditCardModel:
-    def __init__(self, payload: CreditCardValidator, number_encrypted: bytes):
-        self.number_encrypted = number_encrypted
+    def __init__(
+        self,
+        payload: CreditCardValidator,
+        number_encrypted: bytes,
+        decrypted_token: dict,
+    ):
         self.brand = self.get_brand(payload=payload)
+        self.cvv = payload.cvv
         self.expiration_date = self.get_exp_date_formatted(payload=payload)
         self.holder = payload.holder
-        self.cvv = payload.cvv
+        self.number_encrypted = number_encrypted
+        self.user_id = decrypted_token.get("id")
 
     def get_template_to_save(self) -> dict:
         template = {

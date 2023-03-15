@@ -1,7 +1,10 @@
+from typing import NoReturn
+
+import loglifos
 from fastapi.security import OAuth2PasswordRequestForm
 from passlib.hash import bcrypt
 
-from src.domain.exceptions.services.exception import InvalidPassword
+from src.domain.exceptions.services.exception import InvalidPassword, InvalidOrExpiredToken
 from src.domain.models.user.model import UserModel
 from src.repositories.mongodb.user.repository import UserRepository
 from src.services.jwt.service import JwtTokenService
@@ -19,9 +22,13 @@ class AuthenticationService:
         return token
 
     @staticmethod
-    async def verify_token(token):
-        result = await JwtTokenService.validate_token(jwt=token)
-        print(result)
+    async def verify_token(token) -> NoReturn:
+        try:
+            await JwtTokenService.validate_token(jwt=token)
+
+        except Exception as ex:
+            loglifos.error(exception=ex, msg=str(ex))
+            raise InvalidOrExpiredToken()
 
     @staticmethod
     async def verify_password_hash(

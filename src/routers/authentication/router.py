@@ -11,9 +11,9 @@ from src.services.authentication.service import AuthenticationService
 class AuthenticationRouter:
     __router = APIRouter(prefix="/api/v1", tags=["User authentication"])
 
-    @staticmethod
-    def get_authentication_router():
-        return AuthenticationRouter.__router
+    @classmethod
+    def get_authentication_router(cls):
+        return cls.__router
 
     @staticmethod
     @__router.post("/token")

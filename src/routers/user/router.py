@@ -11,9 +11,9 @@ from src.services.user.service import UserService
 class UserRouter:
     __router = APIRouter(prefix="/api/v1", tags=["User registration"])
 
-    @staticmethod
-    def get_user_router():
-        return UserRouter.__router
+    @classmethod
+    def get_user_router(cls):
+        return cls.__router
 
     @staticmethod
     @__router.post("/user")

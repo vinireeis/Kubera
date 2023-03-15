@@ -1,5 +1,6 @@
 from http import HTTPStatus
 
+import loglifos
 from fastapi import FastAPI, Request
 from pydantic import ValidationError
 
@@ -55,24 +56,26 @@ class BaseRouter:
             response = await call_next(request)
 
         except RepositoryException as ex:
+            loglifos.error(exception=ex, msg=str(ex))
             response = ResponseModel(
                 success=ex.success, message=ex.msg, internal_code=ex.internal_code
             ).build_http_response(status_code=ex.status_code)
 
         except ServiceException as ex:
+            loglifos.error(exception=ex, msg=str(ex))
             response = ResponseModel(
                 success=ex.success, message=ex.msg, internal_code=ex.internal_code
             ).build_http_response(status_code=ex.status_code)
 
         except ValidationError as ex:
-            # logging here
+            loglifos.error(exception=ex, msg=str(ex))
             response = ResponseModel(
                 success=False, internal_code=InternalCode.INVALID_PARAMS
             ).build_http_response(status_code=HTTPStatus.BAD_REQUEST)
             return response
 
         except Exception as ex:
-            #  logging here
+            loglifos.error(exception=ex, msg=str(ex))
             response = ResponseModel(
                 success=False, internal_code=InternalCode.INTERNAL_SERVER_ERROR
             ).build_http_response(status_code=HTTPStatus.INTERNAL_SERVER_ERROR)
