@@ -4,7 +4,10 @@ import loglifos
 from fastapi.security import OAuth2PasswordRequestForm
 from passlib.hash import bcrypt
 
-from src.domain.exceptions.services.exception import InvalidPassword, InvalidOrExpiredToken
+from src.domain.exceptions.services.exception import (
+    InvalidPassword,
+    InvalidOrExpiredToken,
+)
 from src.domain.models.user.model import UserModel
 from src.repositories.mongodb.user.repository import UserRepository
 from src.services.jwt.service import JwtTokenService

@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from dateparser import parse
 from dateutil.relativedelta import relativedelta
 
 
@@ -12,5 +13,7 @@ class ExpirationDateModel:
         return exp_date_formatted
 
     @staticmethod
-    def format_to_show(exp_date: datetime):
-        pass
+    def format_to_show(exp_date: str):
+        exp_date_to_datetime = parse(exp_date)
+        exp_date_formatted = exp_date_to_datetime.strftime("%m/%Y")
+        return exp_date_formatted

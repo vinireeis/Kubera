@@ -1,6 +1,10 @@
-from fastapi import APIRouter, Request, Depends
+from http import HTTPStatus
+
+from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordBearer
 
+from src.domain.enums.http_response.internal_code import InternalCode
+from src.domain.models.http_response.model import ResponseModel
 from src.domain.validators.credit_card.validator import CreditCardValidator
 from src.services.authentication.service import AuthenticationService
 from src.services.credit_card.service import CreditCardService
@@ -17,15 +21,25 @@ class CreditCardRouter:
 
     @staticmethod
     @__router.get("/credit-card")
-    async def get_all_credit_cards(
-        request: Request, token: str = Depends(oauth2_scheme)
-    ):
-        pass
+    async def get_all_credit_cards(token: str = Depends(oauth2_scheme)):
+        await AuthenticationService.verify_token(token=token)
+        result = await CreditCardService.get_all_credit_cards(token=token)
+        response = ResponseModel(
+            result=result, internal_code=InternalCode.SUCCESS, success=True
+        ).build_http_response(status_code=HTTPStatus.OK)
+
+        return response
 
     @staticmethod
     @__router.get("/credit-card/{number}")
-    async def get_credit_card_details(number: int, token: str = Depends(oauth2_scheme)):
-        pass
+    async def get_credit_card_details(number: str, token: str = Depends(oauth2_scheme)):
+        await AuthenticationService.verify_token(token=token)
+        result = await CreditCardService.get_credit_card_details(number=number, token=token)
+        response = ResponseModel(
+            result=result, internal_code=InternalCode.SUCCESS, success=True
+        ).build_http_response(status_code=HTTPStatus.OK)
+
+        return response
 
     @staticmethod
     @__router.post("/credit-card")
@@ -36,4 +50,8 @@ class CreditCardRouter:
         message = await CreditCardService.register_new_credit_card(
             payload=payload, token=token
         )
-        return {"teste": "ok"}
+        response = ResponseModel(
+            message=message, internal_code=InternalCode.SUCCESS, success=True
+        ).build_http_response(status_code=HTTPStatus.OK)
+
+        return response

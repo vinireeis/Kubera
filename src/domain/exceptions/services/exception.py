@@ -82,3 +82,19 @@ class CreditCardAlreadyRegistered(ServiceException):
             *args,
             **kwargs
         )
+
+
+class CreditCardNotExists(ServiceException):
+    def __init__(self, *args, **kwargs):
+        self.msg = "Credit card number not registered"
+        self.status_code = HTTPStatus.BAD_REQUEST
+        self.internal_code = InternalCode.DATA_NOT_FOUND
+        self.success = False
+        super().__init__(
+            self.msg,
+            self.status_code,
+            self.internal_code,
+            self.success,
+            *args,
+            **kwargs
+        )

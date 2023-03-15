@@ -29,7 +29,7 @@ class CreditCardValidator(BaseModel, extra=Extra.forbid):
 
     @validator("number")
     def remove_simbols_and_empty_characters(cls, number):
-        number = sub("[!@#$%&*() ]", '', number)
+        number = sub("[!@#$%&*() ]", "", number)
         return number
 
     @validator("number")
