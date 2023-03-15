@@ -1,4 +1,4 @@
-## Kubera API - credit-card system
+## Kubera API - credit card system
 
 ### **Technologies/Frameworks/Libs used:**
 
