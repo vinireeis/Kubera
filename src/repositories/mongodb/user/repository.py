@@ -2,6 +2,7 @@ from typing import NoReturn
 
 from decouple import config
 from pymongo.results import UpdateResult
+import loglifos
 
 from src.domain.exceptions.services.exception import UserNotExists, UserAlreadyExists
 from src.domain.models.user.model import NewUserModel, UserModel
@@ -19,7 +20,7 @@ class UserRepository(MongoDbBaseRepository):
             return collection
 
         except Exception as ex:
-            # logg
+            loglifos.error(exception=ex, msg=str(ex))
             raise ex
 
     @classmethod
@@ -38,7 +39,7 @@ class UserRepository(MongoDbBaseRepository):
                 raise UserAlreadyExists()
 
         except Exception as ex:
-            # logg
+            loglifos.error(exception=ex, msg=str(ex))
             raise ex
 
     @classmethod
@@ -54,5 +55,5 @@ class UserRepository(MongoDbBaseRepository):
             return UserModel(user_data=user_data)
 
         except Exception as ex:
-            # logg
+            loglifos.error(exception=ex, msg=str(ex))
             raise ex

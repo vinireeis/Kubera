@@ -13,7 +13,7 @@ class ExpirationDateModel:
         return exp_date_formatted
 
     @staticmethod
-    def format_to_show(exp_date: str):
+    def format_to_show(exp_date: str) -> str:
         exp_date_to_datetime = parse(exp_date)
         exp_date_formatted = exp_date_to_datetime.strftime("%m/%Y")
         return exp_date_formatted

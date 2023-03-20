@@ -16,7 +16,7 @@ class CreditCardRepository(MongoDbBaseRepository):
             collection = database[config("MONGODB_USER_COLLECTION")]
             return collection
         except Exception as ex:
-            # logg
+            loglifos.error(exception=ex, msg=str(ex))
             raise ex
 
     @classmethod
