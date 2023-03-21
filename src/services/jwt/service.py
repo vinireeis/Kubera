@@ -18,6 +18,7 @@ class JwtTokenService:
             payload=payload, key=cls.key, algorithm=cls.algorithm
         )
         bearer_token = {"access_token": jwt_token, "token_type": "bearer"}
+
         return bearer_token
 
     @classmethod
@@ -25,11 +26,13 @@ class JwtTokenService:
         jwt_lib.decode(
             jwt=jwt, key=cls.key, algorithms=cls.algorithm, do_time_check=True
         )
+
         return True
 
     @classmethod
     async def decode_token(cls, jwt: str):
         token_decoded = jwt_lib.decode(jwt=jwt, key=cls.key, algorithms=cls.algorithm)
+
         return token_decoded
 
     @staticmethod

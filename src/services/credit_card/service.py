@@ -1,6 +1,9 @@
-from typing import List
+from typing import List, Union
 
-from src.domain.exceptions.services.exception import CreditCardAlreadyRegistered, CreditCardNotExists
+from src.domain.exceptions.services.exception import (
+    CreditCardAlreadyRegistered,
+    CreditCardNotExists,
+)
 from src.domain.models.credit_card.model import NewCreditCardModel, UserCreditCardsModel
 from src.domain.validators.credit_card.validator import CreditCardValidator
 from src.repositories.mongodb.credit_card.repository import CreditCardRepository
@@ -12,28 +15,27 @@ class CreditCardService:
     @classmethod
     async def get_all_credit_cards(cls, token: str) -> dict:
         decrypted_token = await JwtTokenService.decode_token(jwt=token)
-        numbers_decrypted = await cls.__get_all_credit_card_decrypted(
+        user_credit_cards = await cls.__get_all_credit_cards_decrypted(
             decrypted_token=decrypted_token
         )
 
-        return {"credit_card": numbers_decrypted}
+        credit_cards_template = user_credit_cards.get_credit_cards_template()
+
+        return credit_cards_template
 
     @classmethod
     async def get_credit_card_details(cls, number: str, token: str):
         decrypted_token = await JwtTokenService.decode_token(jwt=token)
-        credit_cards_result = await CreditCardRepository.find_all_credit_cards(
+        user_credit_cards = await cls.__get_all_credit_cards_decrypted(
             decrypted_token=decrypted_token
         )
-        credit_cards_data = credit_cards_result[0].get("credit_card")
 
-        if not credit_cards_data:
+        if not user_credit_cards.credit_cards:
             raise CreditCardNotExists()
 
-        credit_cards_model = UserCreditCardsModel(credit_cards_data=credit_cards_data)
         credit_card_details_template = (
-            await credit_cards_model.get_credit_card_details_template(number=number)
+            user_credit_cards.get_credit_card_details_template(number=number)
         )
-
         return credit_card_details_template
 
     @classmethod
@@ -41,11 +43,11 @@ class CreditCardService:
         cls, payload: CreditCardValidator, token: str
     ) -> str:
         decrypted_token = await JwtTokenService.decode_token(jwt=token)
-        numbers_decrypted = await cls.__get_all_credit_card_decrypted(
+        user_credit_cards = await cls.__get_all_credit_cards_decrypted(
             decrypted_token=decrypted_token
         )
         await cls.__validate_credit_card_already_exists(
-            numbers_decrypted=numbers_decrypted, payload=payload
+            user_credit_cards=user_credit_cards, payload=payload
         )
         number_encrypted = await CryptographyService.encrypt_number(payload=payload)
 
@@ -60,27 +62,33 @@ class CreditCardService:
         return "Credit card registered successfully"
 
     @staticmethod
-    async def __get_all_credit_card_decrypted(decrypted_token: dict) -> List:
-        credit_cards_data = await CreditCardRepository.find_all_credit_card_numbers(
+    async def __get_all_credit_cards_decrypted(
+        decrypted_token: dict,
+    ) -> Union[UserCreditCardsModel | List]:
+        credit_cards_result = await CreditCardRepository.find_all_credit_cards(
             decrypted_token=decrypted_token
         )
-        numbers = credit_cards_data[0].get("credit_card")
+        credit_cards_data = credit_cards_result[0].get("credit_card")
 
-        if not numbers:
-            return []
+        if not credit_cards_data:
+            credit_cards_data = []
 
-        numbers_decrypted = [
-            await CryptographyService.decrypt_number(number_decrypted.get("number"))
-            for number_decrypted in numbers
-        ]
+        for credit_card in credit_cards_data:
+            number = credit_card.get("number")
+            decrypted_number = await CryptographyService.decrypt_number(number=number)
+            credit_card.update(number=decrypted_number)
 
-        return numbers_decrypted
+        user_credit_cards = UserCreditCardsModel(
+            credit_cards_decrypted=credit_cards_data
+        )
+
+        return user_credit_cards
 
     @staticmethod
     async def __validate_credit_card_already_exists(
-        numbers_decrypted: List, payload: CreditCardValidator
+        user_credit_cards: UserCreditCardsModel, payload: CreditCardValidator
     ) -> bool:
-        if payload.number in numbers_decrypted:
+        if payload.number in user_credit_cards.credit_cards:
             raise CreditCardAlreadyRegistered()
 
         return True

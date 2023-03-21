@@ -1,8 +1,8 @@
 from typing import NoReturn
 
+import loglifos
 from decouple import config
 from pymongo.results import UpdateResult
-import loglifos
 
 from src.domain.exceptions.services.exception import UserNotExists, UserAlreadyExists
 from src.domain.models.user.model import NewUserModel, UserModel

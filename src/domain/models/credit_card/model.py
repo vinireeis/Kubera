@@ -1,8 +1,10 @@
+from re import sub
+from typing import List
+
 from creditcard import CreditCard
 
 from src.domain.models.expiration_date.model import ExpirationDateModel
 from src.domain.validators.credit_card.validator import CreditCardValidator
-from src.services.cryptography.service import CryptographyService
 
 
 class NewCreditCardModel:
@@ -48,22 +50,32 @@ class NewCreditCardModel:
 
 
 class UserCreditCardsModel:
-    def __init__(self, credit_cards_data: dict):
+    def __init__(self, credit_cards_decrypted: List):
         self.credit_cards = [
             CreditCardModel(credit_card_data=credit_card)
-            for credit_card in credit_cards_data
+            for credit_card in credit_cards_decrypted
         ]
 
-    async def get_credit_card_details_template(self, number: str):
+    def get_credit_card_details_template(self, number: str):
         template = {}
+        number_treated = self.__treatment_number(number=number)
         for credit_card in self.credit_cards:
-            decrypted_number = await CryptographyService.decrypt_number(
-                number=credit_card.number
-            )
-            if number == decrypted_number:
-                template = credit_card.get_credit_card_template(number=number)
+            if number_treated == credit_card.number:
+                template = credit_card.get_credit_card_template(number=number_treated)
 
         return template
+
+    def get_credit_cards_template(self) -> dict:
+        template = {
+            "credit_cards": [credit_card.number for credit_card in self.credit_cards]
+        }
+
+        return template
+
+    @staticmethod
+    def __treatment_number(number: str):
+        number = sub("[!@#$%&*() ]", "", number)
+        return number
 
 
 class CreditCardModel:

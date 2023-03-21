@@ -34,7 +34,9 @@ class CreditCardRouter:
     @__router.get("/credit-card/{number}")
     async def get_credit_card_details(number: str, token: str = Depends(oauth2_scheme)):
         await AuthenticationService.verify_token(token=token)
-        result = await CreditCardService.get_credit_card_details(number=number, token=token)
+        result = await CreditCardService.get_credit_card_details(
+            number=number, token=token
+        )
         response = ResponseModel(
             result=result, internal_code=InternalCode.SUCCESS, success=True
         ).build_http_response(status_code=HTTPStatus.OK)

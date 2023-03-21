@@ -14,14 +14,12 @@ from src.services.jwt.service import JwtTokenService
 
 
 class AuthenticationService:
-    @staticmethod
-    async def generate_token(form: OAuth2PasswordRequestForm) -> dict:
+    @classmethod
+    async def generate_token(cls, form: OAuth2PasswordRequestForm) -> dict:
         user_model = await UserRepository.find_one_by_username(username=form.username)
-        await AuthenticationService.verify_password_hash(
-            form=form, user_model=user_model
-        )
-
+        await cls.__verify_password_hash(form=form, user_model=user_model)
         token = await JwtTokenService.generate_token(user_model=user_model)
+
         return token
 
     @staticmethod
@@ -31,10 +29,11 @@ class AuthenticationService:
 
         except Exception as ex:
             loglifos.error(exception=ex, msg=str(ex))
+
             raise InvalidOrExpiredToken()
 
     @staticmethod
-    async def verify_password_hash(
+    async def __verify_password_hash(
         form: OAuth2PasswordRequestForm, user_model: UserModel
     ) -> bool:
         secret = form.password
