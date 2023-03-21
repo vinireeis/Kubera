@@ -35,22 +35,6 @@ class CreditCardRepository(MongoDbBaseRepository):
             raise ex
 
     @classmethod
-    async def find_all_credit_card_numbers(cls, decrypted_token: dict) -> List:
-        collection = await cls._get_collection()
-        id = decrypted_token.get("id")
-
-        try:
-            cursor = collection.find({"id": id}, {"credit_card.number": 1, "_id": 0})
-            credit_cards_data = [
-                credit_card for credit_card in await cursor.to_list(length=100)
-            ]
-            return credit_cards_data
-
-        except Exception as ex:
-            loglifos.error(exception=ex, msg=str(ex))
-            raise ex
-
-    @classmethod
     async def find_all_credit_cards(cls, decrypted_token: dict) -> List:
         collection = await cls._get_collection()
         id = decrypted_token.get("id")
