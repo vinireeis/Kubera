@@ -1,8 +1,9 @@
 from re import sub
-from typing import List
+from typing import List, NoReturn
 
 from creditcard import CreditCard
 
+from src.domain.exceptions.domain.exception import InvalidNumber
 from src.domain.models.expiration_date.model import ExpirationDateModel
 from src.domain.validators.credit_card.validator import CreditCardValidator
 
@@ -58,7 +59,8 @@ class UserCreditCardsModel:
 
     def get_credit_card_details_template(self, number: str):
         template = {}
-        number_treated = self.__treatment_number(number=number)
+        number_treated = self.__regex_number(number=number)
+        self.__is_numeric(number=number_treated)
         for credit_card in self.credit_cards:
             if number_treated == credit_card.number:
                 template = credit_card.get_credit_card_template(number=number_treated)
@@ -73,9 +75,14 @@ class UserCreditCardsModel:
         return template
 
     @staticmethod
-    def __treatment_number(number: str):
+    def __regex_number(number: str) -> str:
         number = sub("[!@#$%&*() ]", "", number)
         return number
+
+    @staticmethod
+    def __is_numeric(number: str) -> NoReturn:
+        if not number.isnumeric():
+            raise InvalidNumber()
 
 
 class CreditCardModel:

@@ -1,5 +1,3 @@
-from typing import List, Union
-
 from src.domain.exceptions.services.exception import (
     CreditCardAlreadyRegistered,
     CreditCardNotExists,
@@ -30,12 +28,13 @@ class CreditCardService:
             decrypted_token=decrypted_token
         )
 
-        if not user_credit_cards.credit_cards:
-            raise CreditCardNotExists()
-
         credit_card_details_template = (
             user_credit_cards.get_credit_card_details_template(number=number)
         )
+
+        if not credit_card_details_template:
+            raise CreditCardNotExists()
+
         return credit_card_details_template
 
     @classmethod
@@ -64,7 +63,7 @@ class CreditCardService:
     @staticmethod
     async def __get_all_credit_cards_decrypted(
         decrypted_token: dict,
-    ) -> Union[UserCreditCardsModel | List]:
+    ) -> UserCreditCardsModel:
         credit_cards_result = await CreditCardRepository.find_all_credit_cards(
             decrypted_token=decrypted_token
         )

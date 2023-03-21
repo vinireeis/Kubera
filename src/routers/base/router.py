@@ -2,10 +2,13 @@ from http import HTTPStatus
 
 import loglifos
 from fastapi import FastAPI, Request
-from pydantic import ValidationError
 
 from src.domain.enums.http_response.internal_code import InternalCode
-from src.domain.exceptions.base.exception import RepositoryException, ServiceException
+from src.domain.exceptions.base.exception import (
+    RepositoryException,
+    ServiceException,
+    DomainException,
+)
 from src.domain.models.http_response.model import ResponseModel
 from src.routers.authentication.router import AuthenticationRouter
 from src.routers.credit_card.router import CreditCardRouter
@@ -55,6 +58,13 @@ class BaseRouter:
         try:
             response = await call_next(request)
 
+        except DomainException as ex:
+            loglifos.error(exception=ex, msg=str(ex))
+            response = ResponseModel(
+                success=ex.success, message=ex.msg, internal_code=ex.internal_code
+            ).build_http_response(status_code=HTTPStatus.BAD_REQUEST)
+            return response
+
         except RepositoryException as ex:
             loglifos.error(exception=ex, msg=str(ex))
             response = ResponseModel(
@@ -66,13 +76,6 @@ class BaseRouter:
             response = ResponseModel(
                 success=ex.success, message=ex.msg, internal_code=ex.internal_code
             ).build_http_response(status_code=ex.status_code)
-
-        except ValidationError as ex:
-            loglifos.error(exception=ex, msg=str(ex))
-            response = ResponseModel(
-                success=False, internal_code=InternalCode.INVALID_PARAMS
-            ).build_http_response(status_code=HTTPStatus.BAD_REQUEST)
-            return response
 
         except Exception as ex:
             loglifos.error(exception=ex, msg=str(ex))

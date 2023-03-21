@@ -5,8 +5,16 @@ from typing import Union, Optional
 import loglifos
 from creditcard import CreditCard
 from dateparser import parse
-from pydantic import BaseModel, validator, Extra, constr, ValidationError
+from pydantic import BaseModel, validator, Extra, constr
 from pytz import utc
+
+from src.domain.exceptions.domain.exception import (
+    InvalidNumber,
+    InvalidCreditCardNumber,
+    InvalidExpDate,
+    ExpiredCreditCard,
+    InvalidCvv,
+)
 
 
 class CreditCardValidator(BaseModel, extra=Extra.forbid):
@@ -23,7 +31,7 @@ class CreditCardValidator(BaseModel, extra=Extra.forbid):
         cvv_length = len(str(cvv))
 
         if 2 < cvv_length > 3:
-            raise ValidationError("Cvv can only have between 2 and 3 numbers.")
+            raise InvalidCvv()
 
         return int(cvv)
 
@@ -36,9 +44,10 @@ class CreditCardValidator(BaseModel, extra=Extra.forbid):
     def validate_credit_card_number_is_numeric(cls, number) -> str:
         try:
             int(number)
+
         except Exception as ex:
             loglifos.error(exception=ex, msg=str(ex))
-            raise ValidationError("The number must contain numeric characters only.")
+            raise InvalidNumber()
 
         return number
 
@@ -49,9 +58,11 @@ class CreditCardValidator(BaseModel, extra=Extra.forbid):
             is_valid = credit_card.is_valid()
 
             if not is_valid:
-                raise ValidationError("Invalid credit card number.")
+                raise InvalidCreditCardNumber()
+
         except Exception as ex:
             loglifos.error(exception=ex, msg=str(ex))
+            raise InvalidCreditCardNumber()
 
         return number
 
@@ -60,17 +71,16 @@ class CreditCardValidator(BaseModel, extra=Extra.forbid):
         try:
             expiration_date_converted = parse(exp_date)
             expiration_date_utc = expiration_date_converted.astimezone(tz=utc)
+
         except Exception as ex:
             loglifos.error(exception=ex, msg=str(ex))
-            raise ValidationError(
-                'invalid expiry date format, use as follows "MM/YYYY" or "MM-YYYY".'
-            )
+            raise InvalidExpDate()
 
         today_datetime = datetime.today()
         today_utc = today_datetime.astimezone(tz=utc)
         credit_card_is_expired = expiration_date_utc < today_utc
 
         if credit_card_is_expired:
-            raise ValidationError("Expired credit card.")
+            raise ExpiredCreditCard()
 
         return expiration_date_utc
