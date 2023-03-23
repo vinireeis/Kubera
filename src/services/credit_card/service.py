@@ -67,10 +67,7 @@ class CreditCardService:
         credit_cards_result = await CreditCardRepository.find_all_credit_cards(
             decrypted_token=decrypted_token
         )
-        credit_cards_data = credit_cards_result[0].get("credit_card")
-
-        if not credit_cards_data:
-            credit_cards_data = []
+        credit_cards_data = credit_cards_result[0].get("credit_card", [])
 
         for credit_card in credit_cards_data:
             number = credit_card.get("number")
